@@ -28,6 +28,7 @@ export default function VotosPage({ votos }: InferGetStaticPropsType<typeof getS
             <Card voto={voto} key={index} />
           ))}
         </div>
+        <></>
       </div>
     </div>
   )
