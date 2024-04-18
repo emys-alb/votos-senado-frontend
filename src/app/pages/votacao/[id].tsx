@@ -1,5 +1,10 @@
 import Card, { Voto } from "@/app/components/card";
 import { GetStaticPaths, GetStaticProps } from "next";
+import { ParsedUrlQuery } from "querystring";
+
+interface Params extends ParsedUrlQuery {
+  slug: string;
+}
 
 export async function buildData() {
     const res = await fetch("https://raw.githubusercontent.com/emys-alb/votos-senado/main/out/dados.json")
@@ -41,19 +46,3 @@ export const getStaticPaths: GetStaticPaths = async () => {
       fallback: true,
     };
 };
-
-export const getStaticProps: GetStaticProps<{ votos: [Voto] }> = async ({
-    params,
-  }) => {
-    const { id } = params;
-    const votacao: [Voto]  = await buildData();
-
-    const votos = votacao.slice(id * 12, (id + 1) * 12)
-
-    return {
-      props: {
-        votos: votos,
-      },
-    };
-  };
-  
