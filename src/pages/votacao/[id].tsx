@@ -2,18 +2,18 @@ import Card, { Voto } from "@/app/components/card";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { ParsedUrlQuery } from "querystring";
 import "../../app/globals.css";
+import PaginationGroup from "@/app/components/pagination";
 
 interface Params extends ParsedUrlQuery {
   id: string;
 }
 
-export async function buildData() {
+async function buildData() {
   const res = await fetch("https://raw.githubusercontent.com/emys-alb/votos-senado/main/out/dados.json")
   return res.json()
 }
 
 export default function VotosPage({ votos }: InferGetStaticPropsType<typeof getStaticProps>) {
-
   return (
     <div className="min-h-screen bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -28,7 +28,9 @@ export default function VotosPage({ votos }: InferGetStaticPropsType<typeof getS
             <Card voto={voto} key={index} />
           ))}
         </div>
-        <></>
+        <div className="mx-auto">
+          <PaginationGroup />
+        </div>
       </div>
     </div>
   )
@@ -44,13 +46,26 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
   return {
     paths,
-    fallback: true,
+    fallback: 'blocking',
   };
 };
 
+function parseDate(date: string) {
+  const [day, month, year] = date.split('/');
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+}
+
+function compareDates(voto1: Voto, voto2: Voto) {
+  const dateA = parseDate(voto1.data)
+  const dateB = parseDate(voto2.data)
+
+  return dateB.getTime() - dateA.getTime()
+}
+
 export const getStaticProps = (async (context) => {
   const { id } = context.params as Params;
-  const votacao: [Voto] = await buildData();
+  let votacao: [Voto] = await buildData();
+  votacao = votacao.sort(compareDates)
 
   const intId = parseInt(id);
 
