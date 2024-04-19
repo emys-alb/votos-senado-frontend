@@ -3,7 +3,7 @@
 import Card, { Voto } from './components/card';
 
 
-export async function buildData() {
+async function buildData() {
     const res = await fetch("https://raw.githubusercontent.com/emys-alb/votos-senado/main/out/dados.json")
     return res.json()
 }
